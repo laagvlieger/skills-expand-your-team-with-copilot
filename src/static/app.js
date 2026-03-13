@@ -533,6 +533,20 @@ document.addEventListener("DOMContentLoaded", () => {
       </div>
     `;
 
+    // Build share URLs for the activity
+    const activityUrl = window.location.href.split("?")[0] + "?activity=" + encodeURIComponent(name);
+    const shareText = encodeURIComponent(`Check out ${name} at Mergington High School! ${details.description}`);
+    const shareUrl = encodeURIComponent(activityUrl);
+    const shareButtons = `
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <a class="share-btn share-twitter" href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on Twitter/X">𝕏</a>
+        <a class="share-btn share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=${shareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on Facebook">f</a>
+        <a class="share-btn share-whatsapp" href="https://wa.me/?text=${shareText}%20${shareUrl}" target="_blank" rel="noopener noreferrer" aria-label="Share on WhatsApp">&#128172;</a>
+        <button class="share-btn share-copy" data-share-url="${activityUrl}" aria-label="Copy link">&#128279;</button>
+      </div>
+    `;
+
     activityCard.innerHTML = `
       ${tagHtml}
       <h4>${name}</h4>
@@ -582,6 +596,7 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        ${shareButtons}
       </div>
     `;
 
@@ -590,6 +605,19 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteButtons.forEach((button) => {
       button.addEventListener("click", handleUnregister);
     });
+
+    // Add click handler for copy link button
+    const copyButton = activityCard.querySelector(".share-copy");
+    if (copyButton) {
+      copyButton.addEventListener("click", () => {
+        const url = copyButton.dataset.shareUrl;
+        navigator.clipboard.writeText(url).then(() => {
+          showMessage("Link copied to clipboard!", "success");
+        }).catch(() => {
+          showMessage("Could not copy link.", "error");
+        });
+      });
+    }
 
     // Add click handler for register button (only when authenticated)
     if (currentUser) {
